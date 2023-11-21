@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: charity-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: charity
+  template:
+    metadata:
+      labels:
+        app: charity
+    spec:
+      containers:
+      - name: charity-pod
+        image: demoregistry2211.azurecr.io/charity:latest
+        envFrom:
+        - secretRef:
+            name: sharecare-db-secret
+        env:
+        - name: DATABASE_NAME
+          value: charity
+        ports:
+        - containerPort: 3000
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 150m
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: charity-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: charity
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sharecare-charity-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            backend:
+              service:
+                name: charity-svc
+                port:
+                  number: 80
+            path: /charities

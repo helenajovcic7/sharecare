@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sharecare-web-deployment
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sharecare-web
+  template:
+    metadata:
+      labels:
+        app: sharecare-web
+    spec:
+      containers:
+      - name: sharecare-web-pod
+        image: demoregistry2211.azurecr.io/web:latest
+        env:
+        - name: BASE_URL
+          value: http://192.168.0.122
+        ports:
+        - containerPort: 5000
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 150m
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 5000
+  selector:
+    app: sharecare-web
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sharecare-web-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            backend:
+              service:
+                name: web-svc
+                port:
+                  number: 80
+            path: /

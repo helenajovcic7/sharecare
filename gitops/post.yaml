@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: post-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: post
+  template:
+    metadata:
+      labels:
+        app: post
+    spec:
+      containers:
+      - name: post-pod
+        image: demoregistry2211.azurecr.io/post:latest
+        envFrom:
+        - secretRef:
+            name: sharecare-db-secret
+        env:
+        - name: DATABASE_NAME
+          value: post
+        - name: MEDIA_SERVICE_URL
+          value: http://media-svc
+        ports:
+        - containerPort: 3000
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 500m
+          requests:
+            cpu: 150m
+      imagePullSecrets:
+      - name: acr-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: post-svc
+  namespace: default
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 3000
+  selector:
+    app: post
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sharecare-post-ingress
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+          - pathType: Prefix
+            backend:
+              service:
+                name: post-svc
+                port:
+                  number: 80
+            path: /posts
