@@ -1,9 +1,9 @@
-<template>
+gija<template>
   <v-app id="inspire">
     <v-app-bar centered app color="indigo darken-3" class="app-bar" flat>
       <div @click="resetIndexes()" class="title-wrapper">
         <v-icon class="white--text mr-3 text-h4">mdi-hand-heart-outline</v-icon>
-        <h2 class="white--text">Share&Care</h2>
+        <h2 class="white--text">Sinergija</h2>
       </div>
     </v-app-bar>
 
