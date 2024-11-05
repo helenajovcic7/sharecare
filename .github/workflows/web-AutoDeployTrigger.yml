@@ -36,8 +36,8 @@ jobs:
         with:
           push: true
           tags: acrnephosdev.azurecr.io/sharecare/web:${{ github.sha }}
-          file: ./sharecare/web/Dockerfile
-          context: ./sharecare/web/
+          file: ./web/Dockerfile
+          context: ./web/
 
 
   deploy:
