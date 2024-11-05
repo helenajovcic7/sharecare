@@ -35,9 +35,9 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: sharecare.azurecr.io/web:${{ github.sha }}
-          file: ./web/Dockerfile
-          context: ./web/
+          tags: acrnephosdev.azurecr.io/sharecare/web:${{ github.sha }}
+          file: ./sharecare/web/Dockerfile
+          context: ./sharecare/web/
 
 
   deploy:
